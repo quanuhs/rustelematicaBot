@@ -7,3 +7,5 @@ db2.sql
 /venv/
 bin
 lib
+/__pycache__/
+
