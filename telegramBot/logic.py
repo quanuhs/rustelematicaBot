@@ -49,11 +49,6 @@ def start(message):
     bot.send_message(message.from_user.id, text_description, reply_markup=markup.auth())
 
 
-def data_incorrect(message):
-    markup = Markups("RU")
-    bot.send_message(message.from_user.id, markup.text.auth_text, reply_markup=markup.auth())
-
-
 @bot.callback_query_handler(func=lambda call: call.data == "auth")
 def callback_login(call: telebot.types.CallbackQuery):
     markup = Markups("RU")
@@ -110,9 +105,9 @@ def temp_handle_text(message):
             bot.send_message(temp_user.telegram_id, markup.text.auth_success, reply_markup=markup.start_menu())
 
     if error_message:
-        bot.send_message(temp_user.telegram_id, error_message)
+        bot.send_message(temp_user.telegram_id, error_message, reply_markup=markup.auth())
         temp_user.delete()
-        return False
+        return True
 
     temp_user.save()
 
