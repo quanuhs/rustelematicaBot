@@ -17,7 +17,10 @@ api: RustelematicaAPI = RustelematicaAPI(None)
 class Markups:
     def __init__(self, language):
         self.language = language
-        self.text = BotDictionary.objects.filter(language=self.language).first()
+
+    @property
+    def text(self):
+        return BotDictionary.objects.filter(language=self.language).first()
 
     def start_menu(self):
         keyboard = types.ReplyKeyboardMarkup(True, True)
