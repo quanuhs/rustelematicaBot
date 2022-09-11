@@ -20,3 +20,8 @@ class BotDictionaryAdmin(admin.ModelAdmin):
             'fields': ('welcome_text', 'error_no_command')
         })
     )
+
+
+@admin.register(BotSettings)
+class BotSettingsAdmin(admin.ModelAdmin):
+    pass
