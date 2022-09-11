@@ -2,10 +2,12 @@ import telebot
 from .models import BotSettings
 
 
-bot = telebot.TeleBot(None)
+bot:telebot.TeleBot = telebot.TeleBot(None, threaded=False)
 
 
 def handle_message(request):
+    global bot
+
     settings = BotSettings.objects.filter().first()
 
     if settings is not None:
