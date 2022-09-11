@@ -2,7 +2,7 @@ import telebot
 from telebot import types
 from .api_handler import RustelematicaAPI
 
-from .models import BotDictionary
+from .models import BotDictionary, UserInfo
 
 
 class TelegramBot(telebot.TeleBot):
@@ -10,8 +10,28 @@ class TelegramBot(telebot.TeleBot):
         self.token = new_token
 
 
+class TemporaryBase(dict):
+
+    def add_user(self, user_id):
+        self.update({user_id: {"status": self.LOGIN(), "id": user_id}})
+
+    @staticmethod
+    def PASSWORD_1():
+        return "password_1"
+
+    @staticmethod
+    def PASSWORD_2():
+        return "password_2"
+
+    @staticmethod
+    def LOGIN():
+        return "login"
+
+
 bot: TelegramBot = TelegramBot(None)
 api: RustelematicaAPI = RustelematicaAPI(None)
+
+temp_base = TemporaryBase()
 
 
 class Markups:
@@ -53,15 +73,63 @@ def start(message):
 def callback_login(call: telebot.types.CallbackQuery):
     msg = bot.send_message(call.message.chat.id, "Введите логин")
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
-    bot.register_next_step_handler(msg, login_entered)
+    temp_base.add_user(call.from_user.id)
 
 
-def login_entered(message):
-    potential_login = message.text
-    msg = bot.send_message(message.from_user.id, "Введите пароль")
-    bot.register_next_step_handler(msg, password_entered, potential_login)
+@bot.message_handler(content_types=['text'])
+def handle_text(message):
+    if temp_handle_text(message):
+        return
+
+    if user_handle_text(message):
+        return
+
+    start()
 
 
-def password_entered(message, potential_login):
-    potential_password = message.text
-    bot.send_message(message.from_user.id, f"{potential_login} | {potential_password}")
+def check_login(potential_login):
+    return {}
+
+
+def check_password_1(login, potential_password_1):
+    return True
+
+
+def check_password_2(login, password_1, potential_password_2):
+    return True
+
+
+def create_user(temp_user):
+    pass
+
+
+def temp_handle_text(message):
+    if temp_base.get(message.from_user.id) is None:
+        return False
+
+    temp_user = temp_base.get(message.from_user.id)
+
+    if temp_user["status"] == temp_base.LOGIN():
+        if check_login(message.text):
+            temp_user[temp_base.LOGIN()] = message.text
+            temp_user["status"] = temp_base.PASSWORD_1()
+            bot.send_message(temp_user["id"], "Пароль 1")
+
+    elif temp_user["status"] == temp_base.PASSWORD_1():
+        if check_password_1(temp_user[temp_base.LOGIN()], message.text):
+            temp_user[temp_base.PASSWORD_1()] = message.text
+            temp_user["status"] = temp_base.PASSWORD_2()
+            bot.send_message(temp_user["id"], "Пароль 2")
+
+    elif temp_user["status"] == temp_base.PASSWORD_2():
+        if check_password_2(temp_user[temp_base.LOGIN()], temp_user[temp_base.PASSWORD_1()], message.text):
+            create_user(temp_user)
+            del temp_base[message.from_user.id]
+            bot.send_message(temp_user["id"], "Авторизовал")
+
+    bot.send_message(temp_user["id"], temp_user)
+    return True
+
+
+def user_handle_text(message):
+    bot.send_message(message.from_user.id, "cool")
