@@ -1,8 +1,12 @@
 import telebot
-from models import BotSettings
+from .models import BotSettings
 
-token = BotSettings.objects.filter().first().token
-bot = telebot.TeleBot(token)
+settings = BotSettings.objects.filter().first()
+
+if settings is not None:
+    bot = telebot.TeleBot(settings.token)
+else:
+    bot = telebot.TeleBot(None)
 
 
 def handle_message(request):
