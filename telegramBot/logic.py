@@ -9,7 +9,8 @@ class TelegramBot(telebot.TeleBot):
     def set_token(self, new_token):
         self.token = new_token
 
-bot: TelegramBot = TelegramBot(None, threaded=False)
+
+bot: TelegramBot = TelegramBot(None)
 api: RustelematicaAPI = RustelematicaAPI(None)
 
 
@@ -50,19 +51,17 @@ def start(message):
 
 @bot.callback_query_handler(func=lambda call: call.data == "auth")
 def callback_login(call: telebot.types.CallbackQuery):
-    bot.send_message(call.message.chat.id, "Введите логин")
+    msg = bot.send_message(call.message.chat.id, "Введите логин")
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
-    bot.register_next_step_handler(call.message, login_entered)
+    bot.register_next_step_handler(msg, login_entered)
 
 
 def login_entered(message):
     potential_login = message.text
-    bot.send_message(message.from_user.id, "Введите пароль")
-    bot.register_next_step_handler(message, password_entered, potential_login)
+    msg = bot.send_message(message.from_user.id, "Введите пароль")
+    bot.register_next_step_handler(msg, password_entered, potential_login)
 
 
 def password_entered(message, potential_login):
     potential_password = message.text
     bot.send_message(message.from_user.id, f"{potential_login} | {potential_password}")
-
-
