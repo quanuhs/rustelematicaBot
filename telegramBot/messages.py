@@ -2,16 +2,19 @@ import telebot
 from .models import BotSettings
 
 
-bot:telebot.TeleBot = telebot.TeleBot(None, threaded=False)
+class TelegramBot(telebot.TeleBot):
+    def set_token(self, new_token):
+        self.token = new_token
+
+
+bot: TelegramBot = TelegramBot(None)
 
 
 def handle_message(request):
-    global bot
-
     settings = BotSettings.objects.filter().first()
 
     if settings is not None:
-        bot = telebot.TeleBot(settings.token)
+        bot.set_token(settings.token)
     else:
         return
 
