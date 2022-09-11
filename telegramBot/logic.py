@@ -81,9 +81,10 @@ def temp_handle_text(message):
     error_message = None
 
     if temp_user.panel_id:
-        bot.send_message(temp_user.telegram_id, api.check_panel_id(temp_user.panel_id))
+        bot.send_message(temp_user.telegram_id, str(api.check_panel_id(temp_user.panel_id)))
         if temp_user.status == UserInfo.USER_STATUS[1][0]:
             bot.send_message(temp_user.telegram_id, api.check_panel_id(temp_user.panel_id).get("codechkts")==temp_user.codechkts)
+            bot.send_message(temp_user.telegram_id, api.check_panel_id(temp_user.panel_id).get("codechkts"))
 
     if temp_user.status == UserInfo.USER_STATUS[0][0]:
         if api.check_panel_id(int(message.text)) is None:
