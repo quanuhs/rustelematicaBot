@@ -59,10 +59,11 @@ def callback_login(call: telebot.types.CallbackQuery):
 def login_entered(message):
     potential_login = message.text
     bot.send_message(message.from_user.id, "Введите пароль")
-    bot.register_next_step_handler(message, password_entered)
+    bot.register_next_step_handler(message, password_entered, potential_login)
 
 
-def password_entered(message):
-    login = "..."
+def password_entered(message, potential_login):
     potential_password = message.text
-    bot.send_message(message.from_user.id, f"{login} | {potential_password}")
+    bot.send_message(message.from_user.id, f"{potential_login} | {potential_password}")
+
+
