@@ -1,1 +1,1 @@
-import telepot
+import telebot
