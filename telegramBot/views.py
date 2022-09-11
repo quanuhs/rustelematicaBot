@@ -6,17 +6,11 @@ from django.shortcuts import render
 
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
+from messages import handle_message
 
 
 @csrf_exempt
 def handle_telegram(request, secret_key):
-    data = request.body.decode('utf-8')
-
-    if 'callback_query' in data:
-        #messages.handler_call_back(data)
-        pass
-
-    elif 'message' in data:
-        pass
+    handle_message(request)
 
     return HttpResponse('ok', content_type="text/plain", status=200)
