@@ -30,7 +30,7 @@ class RustelematicaAPI():
         if data is None:
             return None
 
-        if data.get("codechkts") == codechkts:
+        if str(data.get("codechkts")) == codechkts:
             return data
 
         return None
@@ -40,7 +40,7 @@ class RustelematicaAPI():
         if data is None:
             return None
 
-        if data.get("codechstate") == codechstate:
+        if str(data.get("codechstate")) == codechstate:
             return data
 
         return None
