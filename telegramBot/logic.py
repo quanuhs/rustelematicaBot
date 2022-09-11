@@ -49,10 +49,10 @@ def start(message):
     bot.send_message(message.from_user.id, text_description, reply_markup=_markup.auth())
 
 
-@bot.callback_query_handler(func=lambda call: True)
-def callback_login(call:telebot.types.CallbackQuery):
+@bot.callback_query_handler(func=lambda call: "auth")
+def callback_login(call: telebot.types.CallbackQuery):
     bot.send_message(call.message.chat.id, "okey")
-    bot.answer_callback_query(call.id)
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     # msg = bot.message_handler(call.message.chat.id, "Введите логин")
     # bot.register_next_step_handler(msg, login_entered)
 
