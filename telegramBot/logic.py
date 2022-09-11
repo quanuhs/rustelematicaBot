@@ -1,5 +1,4 @@
 import telebot
-from .models import BotSettings
 
 
 class TelegramBot(telebot.TeleBot):
@@ -10,13 +9,10 @@ class TelegramBot(telebot.TeleBot):
 bot: TelegramBot = TelegramBot(None)
 
 
-def handle_message(request):
-    settings = BotSettings.objects.filter().first()
-
-    if settings is not None:
-        bot.set_token(settings.token)
-    else:
+def handle_message(request, token):
+    if token is None:
         return
+    bot.set_token(token)
 
     bot.process_new_updates([telebot.types.Update.de_json(request.body.decode("utf-8"))])
 

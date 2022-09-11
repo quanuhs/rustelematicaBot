@@ -6,12 +6,34 @@ from django.db import models
 class BotSettings(models.Model):
     """Модель настройки Telegram бота"""
 
+    bot_url = models.CharField(max_length=64, verbose_name="Ссылка на бота")
     token = models.CharField(max_length=128, verbose_name="Токен бота")
     webhook_secret = models.CharField(max_length=128, verbose_name="Код webhook")
+
+    def __str__(self):
+        return f"{self.token}"
 
     class Meta:
         verbose_name = "Настройка"
         verbose_name_plural = "Настройки"
+
+
+class UserInfo(models.Model):
+    telegram_id = models.CharField(verbose_name="id пользователя в Telegram", max_length=16)
+    name = models.CharField(verbose_name="Имя пользователя в Telegram", max_length=32)
+
+    panel_id = models.IntegerField(verbose_name="panelid для работы с API")
+    codechkts = models.TextField(verbose_name="codechkts для работы с API")
+    codechstate = models.TextField(verbose_name="codechstate для работы с API")
+    object_uuid = models.TextField(verbose_name="object_uuid для работы с API")
+    service_time = models.DateTimeField(verbose_name="Время начала тестирования")
+
+    def __str__(self):
+        return f"{self.telegram_id} | {self.name} > {self.panel_id}"
+
+    class Meta:
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"
 
 
 class BotDictionary(models.Model):

@@ -3,14 +3,18 @@ import json
 from django.http import HttpResponse
 from django.shortcuts import render
 
-
-# Create your views here.
 from django.views.decorators.csrf import csrf_exempt
-from .messages import handle_message
+from .logic import handle_message
+
+from .models import BotSettings
 
 
 @csrf_exempt
 def handle_telegram(request, secret_key):
-    handle_message(request)
+    settings = BotSettings.objects.filter(webhook_secret=secret_key).first()
+    if settings is None:
+        return HttpResponse("API key is invalid!", content_type="text/plain", status=403)
 
-    return HttpResponse('ok', content_type="text/plain", status=200)
+    handle_message(request, settings.token)
+
+    return HttpResponse('OK', content_type="text/plain", status=200)
