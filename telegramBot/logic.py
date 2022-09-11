@@ -54,7 +54,7 @@ def callback_login(call: telebot.types.CallbackQuery):
     markup = Markups("RU")
     bot.send_message(call.message.chat.id, markup.text.auth_ask_panel_id)
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
-    UserInfo.objects.get_or_create(telegram_id=call.from_user.id, name=call.message.from_user.username or "unknown")
+    UserInfo.objects.get_or_create(telegram_id=call.from_user.id, name=call.from_user.username or "unknown")
 
 
 @bot.message_handler(content_types=['text'])
@@ -102,7 +102,7 @@ def temp_handle_text(message):
         else:
             temp_user.codechstate = message.text
             temp_user.status = UserInfo.USER_STATUS[3][0]
-            bot.send_message(temp_user.telegram_id, markup.text.auth_success)
+            bot.send_message(temp_user.telegram_id, markup.text.auth_success, reply_markup=markup.start_menu())
 
     if error_message:
         bot.send_message(temp_user.telegram_id, error_message)
@@ -121,3 +121,4 @@ def user_handle_text(message):
     if temp_user is None:
         return False
 
+    return True
