@@ -49,7 +49,7 @@ def start(message):
     bot.send_message(message.from_user.id, text_description, reply_markup=_markup.auth())
 
 
-@bot.callback_query_handler(func=lambda call: call == "auth")
+@bot.callback_query_handler(func=lambda call: True)
 def callback_login(call):
     msg = bot.message_handler(call.message.chat.id, "Введите логин")
     bot.register_next_step_handler(msg, login_entered)
