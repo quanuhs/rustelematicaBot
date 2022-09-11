@@ -18,7 +18,7 @@ class BotDictionaryAdmin(admin.ModelAdmin):
             'fields': ['welcome_text', 'error_no_command']
         })
     )
-    exclude = ('language')
+    exclude = ['language']
 
 
 @admin.register(BotSettings)

@@ -95,7 +95,6 @@ def temp_handle_text(message):
             temp_user.status = UserInfo.USER_STATUS[2][0]
             bot.send_message(temp_user.telegram_id, markup.text.auth_ask_codechstate)
 
-
     elif temp_user.status == UserInfo.USER_STATUS[2][0]:
         if not api.check_codechstate(temp_user.panel_id, message.text):
             error_message = markup.text.auth_fail_codechstate
