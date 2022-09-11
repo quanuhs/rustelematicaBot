@@ -50,8 +50,9 @@ def start(message):
 
 
 @bot.callback_query_handler(func=lambda call: True)
-def callback_login(call):
+def callback_login(call:telebot.types.CallbackQuery):
     bot.send_message(call.message.chat.id, "okey")
+    bot.answer_callback_query(call.id)
     # msg = bot.message_handler(call.message.chat.id, "Введите логин")
     # bot.register_next_step_handler(msg, login_entered)
 
