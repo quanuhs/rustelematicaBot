@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from telegramBot.models import BotDictionary, BotSettings
+from telegramBot.models import BotDictionary, BotSettings, UserInfo
 
 
 @admin.register(BotDictionary)
@@ -25,4 +25,9 @@ class BotDictionaryAdmin(admin.ModelAdmin):
 
 @admin.register(BotSettings)
 class BotSettingsAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(UserInfo)
+class UserInfoAdmin(admin.ModelAdmin):
     pass
