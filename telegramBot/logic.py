@@ -47,7 +47,7 @@ def start(message):
     markup = Markups("RU")
     user, created = UserInfo.objects.get_or_create(telegram_id=message.from_user.id, name=message.from_user.username or "unknown")
 
-    if not created:
+    if not created and user.status == UserInfo.USER_STATUS[3][0]:
         bot.send_message(user.telegram_id, markup.text.menu_text, reply_markup=markup.start_menu())
         return
 
