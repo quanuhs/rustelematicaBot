@@ -42,13 +42,18 @@ def handle_message(request, settings):
     bot.process_new_updates([telebot.types.Update.de_json(request.body.decode("utf-8"))])
 
 
-# @bot.message_handler(content_types=['text'])
-# def directives(message: telebot.types.Message):
-#     bot.send_message(message.from_user.id, str(api.get_data(1, 1)))
-
-
 @bot.message_handler(commands=['start'])
 def start(message):
     _markup = Markups("RU")
     text_description = _markup.text.welcome_text
     bot.send_message(message.from_user.id, text_description, reply_markup=_markup.auth())
+
+
+@bot.callback_query_handler(func=lambda call: call == "auth")
+def callback_login(call):
+    msg = bot.message_handler(call.message.chat.id, "Введите логин")
+    bot.register_next_step_handler(msg, login_entered)
+
+
+def login_entered(message):
+    bot.send_message(message.from_user.id, message.text)

@@ -14,7 +14,7 @@ class BotDictionaryAdmin(admin.ModelAdmin):
             'fields': ['auth_text', 'auth_success', 'auth_ask_login', 'auth_fail_login', 'auth_ask_password',
                        'auth_fail_password', 'menu_btn_login']
         }),
-        ('Кнопки меню', {
+        ('Главное меню', {
             'fields': ['menu_text', 'menu_btn_check', 'menu_btn_status', 'menu_btn_logout']
         }),
         ('Прочее', {
