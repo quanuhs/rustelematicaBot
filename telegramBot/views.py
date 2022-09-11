@@ -15,6 +15,6 @@ def handle_telegram(request, secret_key):
     if settings is None:
         return HttpResponse("API key is invalid!", content_type="text/plain", status=403)
 
-    handle_message(request, settings.token)
+    handle_message(request, settings)
 
     return HttpResponse('OK', content_type="text/plain", status=200)
