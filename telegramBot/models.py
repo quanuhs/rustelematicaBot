@@ -23,11 +23,20 @@ class UserInfo(models.Model):
     telegram_id = models.CharField(verbose_name="id пользователя в Telegram", max_length=16)
     name = models.CharField(verbose_name="Имя пользователя в Telegram", max_length=32)
 
-    panel_id = models.IntegerField(verbose_name="panelid для работы с API")
-    codechkts = models.TextField(verbose_name="codechkts для работы с API")
-    codechstate = models.TextField(verbose_name="codechstate для работы с API")
-    object_uuid = models.TextField(verbose_name="object_uuid для работы с API")
-    service_time = models.DateTimeField(verbose_name="Время начала тестирования")
+    panel_id = models.IntegerField(verbose_name="panelid для работы с API", null=True)
+    codechkts = models.TextField(verbose_name="codechkts для работы с API", null=True)
+    codechstate = models.TextField(verbose_name="codechstate для работы с API", null=True)
+    object_uuid = models.TextField(verbose_name="object_uuid для работы с API", null=True)
+    service_time = models.DateTimeField(verbose_name="Время начала тестирования", null=True)
+
+    USER_STATUS = (
+        ('pending_login', 'Ожидаем ввода логина'),
+        ('pending_password_1', 'Ожидаем ввод codechkts'),
+        ('pending_password_2', 'Ожидаем ввод codechstate'),
+        ('active', "Авторизованный")
+    )
+
+    status = models.CharField(choices=USER_STATUS, max_length=32, verbose_name='Статус', default=USER_STATUS[0][0])
 
     def __str__(self):
         return f"{self.telegram_id} | {self.name} > {self.panel_id}"

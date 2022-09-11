@@ -71,9 +71,9 @@ def start(message):
 
 @bot.callback_query_handler(func=lambda call: call.data == "auth")
 def callback_login(call: telebot.types.CallbackQuery):
-    msg = bot.send_message(call.message.chat.id, "Введите логин")
+    bot.send_message(call.message.chat.id, "Введите логин")
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
-    temp_base.add_user(call.from_user.id)
+    UserInfo.objects.create(telegram_id=call.message.from_user.id, name=call.message.from_user.full_name or "unknown")
 
 
 @bot.message_handler(content_types=['text'])
@@ -104,33 +104,35 @@ def create_user(temp_user):
 
 
 def temp_handle_text(message):
-    if temp_base.get(message.from_user.id) is None:
+    temp_user: UserInfo = UserInfo.objects.filter(telegram_id=message.from_user.id).first()
+
+    if temp_user is None:
         return False
 
-    temp_user = temp_base.get(message.from_user.id)
+    if temp_user.status == UserInfo.USER_STATUS[3]:
+        return False
 
-    if temp_user["status"] == temp_base.LOGIN():
+    if temp_user.status == UserInfo.USER_STATUS[0]:
         if check_login(message.text):
-            temp_user[temp_base.LOGIN()] = message.text
-            temp_user["status"] = temp_base.PASSWORD_1()
-            bot.send_message(temp_user["id"], "Пароль 1")
+            temp_user.panel_id = message.text
+            temp_user.status = UserInfo.USER_STATUS[1]
+            bot.send_message(temp_user.telegram_id, "Пароль 1")
 
-    elif temp_user["status"] == temp_base.PASSWORD_1():
-        if check_password_1(temp_user[temp_base.LOGIN()], message.text):
-            temp_user[temp_base.PASSWORD_1()] = message.text
-            temp_user["status"] = temp_base.PASSWORD_2()
-            bot.send_message(temp_user["id"], "Пароль 2")
+    elif temp_user.status == UserInfo.USER_STATUS[1]:
+        if check_password_1(temp_user.panel_id, message.text):
+            temp_user.codechkts = message.text
+            temp_user.status = UserInfo.USER_STATUS[2]
+            bot.send_message(temp_user.telegram_id, "Пароль 2")
 
-    elif temp_user["status"] == temp_base.PASSWORD_2():
-        if check_password_2(temp_user[temp_base.LOGIN()], temp_user[temp_base.PASSWORD_1()], message.text):
-            create_user(temp_user)
-            del temp_base[message.from_user.id]
-            bot.send_message(temp_user["id"], f"Авторизовал {temp_user[temp_base.LOGIN()]} | {temp_user[temp_base.PASSWORD_1()]} | {temp_user[temp_base.PASSWORD_2()]}")
+    elif temp_user.status == UserInfo.USER_STATUS[2]:
+        if check_password_2(temp_user.panel_id, temp_user.codechkts, message.text):
+            temp_user.codechstate = message.text
+            temp_user.status = UserInfo.USER_STATUS[3]
+            bot.send_message(temp_user.telegram_id, f"Авторизовал")
 
+    temp_user.save()
     return True
 
 
 def user_handle_text(message):
     return False
-
-
