@@ -11,7 +11,7 @@ class BotSettings(models.Model):
     webhook_secret = models.CharField(max_length=128, verbose_name="Код webhook")
 
     def __str__(self):
-        return f"{self.token}"
+        return f"{self.webhook_secret}"
 
     class Meta:
         verbose_name = "Настройка"
