@@ -9,8 +9,7 @@ class TelegramBot(telebot.TeleBot):
     def set_token(self, new_token):
         self.token = new_token
 
-
-bot: TelegramBot = TelegramBot(None)
+bot: TelegramBot = TelegramBot(None, threaded=False)
 api: RustelematicaAPI = RustelematicaAPI(None)
 
 
