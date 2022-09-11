@@ -58,6 +58,11 @@ def start(message):
 @bot.callback_query_handler(func=lambda call: call.data == "auth")
 def callback_login(call: telebot.types.CallbackQuery):
     markup = Markups("RU")
+    user, created = UserInfo.objects.get_or_create(telegram_id=call.from_user.id, name=call.from_user.username or "unknown")
+    if not created:
+        user.status = UserInfo.USER_STATUS[0][0]
+        user.save()
+
     bot.send_message(call.message.chat.id, markup.text.auth_ask_panel_id)
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
 
