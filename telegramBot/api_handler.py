@@ -22,3 +22,21 @@ class RustelematicaAPI():
     def set_api(self, api_key):
         self.api_key = api_key
 
+    def check_panel_id(self, panel_id):
+        return self.get_data(1, panel_id)
+
+    def check_codechkts(self, panel_id, codechkts):
+        data = self.check_panel_id(panel_id)
+        if data is None:
+            return None
+
+        if data.get("codechkts") == codechkts:
+            return data
+
+    def check_codechstate(self, panel_id, codechstate):
+        data = self.check_panel_id(panel_id)
+        if data is None:
+            return None
+
+        if data.get("codechstate") == codechstate:
+            return data

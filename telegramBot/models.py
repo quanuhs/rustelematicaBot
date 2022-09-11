@@ -54,11 +54,13 @@ class BotDictionary(models.Model):
     auth_text = models.TextField(verbose_name="Текст запроса авторизации")
     auth_success = models.TextField(verbose_name="Текст успешной авторизации")
 
-    auth_ask_login = models.TextField(verbose_name="Текст запроса логина")
-    auth_fail_login = models.TextField(verbose_name="Текст неврного логина")
+    auth_ask_panel_id = models.TextField(verbose_name="Текст запроса panelid")
+    auth_fail_panel_id = models.TextField(verbose_name="Текст неверного panelid")
 
-    auth_ask_password = models.TextField(verbose_name="Текст запроса пароля")
-    auth_fail_password = models.TextField(verbose_name="Текст неверного пароля")
+    auth_ask_codechkts = models.TextField(verbose_name="Текст запроса codechkts")
+    auth_ask_codechstate = models.TextField(verbose_name="Текст запроса codechstate")
+    auth_fail_codechkts = models.TextField(verbose_name="Текст неверного codechkts")
+    auth_fail_codechstate = models.TextField(verbose_name="Текст неверного codechstate")
 
     menu_text = models.TextField(verbose_name="Текст главного меню")
 
