@@ -73,7 +73,7 @@ def start(message):
 def callback_login(call: telebot.types.CallbackQuery):
     bot.send_message(call.message.chat.id, "Введите логин")
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
-    UserInfo.objects.create(telegram_id=call.message.from_user.id, name=call.message.from_user.full_name or "unknown")
+    UserInfo.objects.create(telegram_id=call.message.chat.id, name=call.message.from_user.full_name or "unknown")
 
 
 @bot.message_handler(content_types=['text'])
@@ -135,4 +135,4 @@ def temp_handle_text(message):
 
 
 def user_handle_text(message):
-    return False
+    bot.send_message(message.from_user.id, "we are here!")
