@@ -45,6 +45,12 @@ def handle_message(request, settings):
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = Markups("RU")
+    user, created = UserInfo.objects.get_or_create(telegram_id=message.from_user.id, name=message.from_user.username or "unknown")
+
+    if not created:
+        bot.send_message(user.telegram_id, markup.text.menu_text, reply_markup=markup.start_menu())
+        return
+
     text_description = markup.text.welcome_text
     bot.send_message(message.from_user.id, text_description, reply_markup=markup.auth())
 
@@ -54,7 +60,6 @@ def callback_login(call: telebot.types.CallbackQuery):
     markup = Markups("RU")
     bot.send_message(call.message.chat.id, markup.text.auth_ask_panel_id)
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
-    UserInfo.objects.get_or_create(telegram_id=call.from_user.id, name=call.from_user.username or "unknown")
 
 
 @bot.message_handler(content_types=['text'])
