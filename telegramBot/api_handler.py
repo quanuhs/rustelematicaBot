@@ -33,6 +33,8 @@ class RustelematicaAPI():
         if data.get("codechkts") == codechkts:
             return data
 
+        return None
+
     def check_codechstate(self, panel_id, codechstate):
         data = self.check_panel_id(panel_id)
         if data is None:
@@ -40,3 +42,5 @@ class RustelematicaAPI():
 
         if data.get("codechstate") == codechstate:
             return data
+
+        return None

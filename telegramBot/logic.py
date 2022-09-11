@@ -80,7 +80,7 @@ def temp_handle_text(message):
     error_message = None
 
     if temp_user.status == UserInfo.USER_STATUS[0][0]:
-        if not api.check_panel_id(int(message.text)):
+        if api.check_panel_id(int(message.text)) is None:
             error_message = markup.text.auth_fail_panel_id
         else:
             temp_user.panel_id = int(message.text)
@@ -88,7 +88,7 @@ def temp_handle_text(message):
             bot.send_message(temp_user.telegram_id, markup.text.auth_ask_codechkts)
 
     elif temp_user.status == UserInfo.USER_STATUS[1][0]:
-        if not api.check_codechkts(temp_user.panel_id, message.text):
+        if api.check_codechkts(temp_user.panel_id, message.text) is None:
             error_message = markup.text.auth_fail_codechkts
         else:
             temp_user.codechkts = message.text
@@ -96,7 +96,7 @@ def temp_handle_text(message):
             bot.send_message(temp_user.telegram_id, markup.text.auth_ask_codechstate)
 
     elif temp_user.status == UserInfo.USER_STATUS[2][0]:
-        if not api.check_codechstate(temp_user.panel_id, message.text):
+        if api.check_codechstate(temp_user.panel_id, message.text) is None:
             error_message = markup.text.auth_fail_codechstate
         else:
             temp_user.codechstate = message.text
@@ -106,8 +106,9 @@ def temp_handle_text(message):
     if error_message:
         bot.send_message(temp_user.telegram_id, error_message)
         temp_user.delete()
+    else:
+        temp_user.save()
 
-    temp_user.save()
     return True
 
 
