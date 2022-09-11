@@ -73,7 +73,7 @@ def start(message):
 def callback_login(call: telebot.types.CallbackQuery):
     bot.send_message(call.message.chat.id, "Введите логин")
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
-    UserInfo.objects.create(telegram_id=call.from_user.id, name=call.message.from_user.username or "unknown")
+    UserInfo.objects.get_or_create(telegram_id=call.from_user.id, name=call.message.from_user.username or "unknown")
 
 
 @bot.message_handler(content_types=['text'])
@@ -114,7 +114,7 @@ def temp_handle_text(message):
 
     if temp_user.status == UserInfo.USER_STATUS[0][0]:
         if check_login(message.text):
-            temp_user.panel_id = message.text
+            temp_user.panel_id = int(message.text)
             temp_user.status = UserInfo.USER_STATUS[1][0]
             bot.send_message(temp_user.telegram_id, "Пароль 1")
 
