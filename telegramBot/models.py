@@ -53,12 +53,12 @@ class BotDictionary(models.Model):
 
     menu_text = models.TextField(verbose_name="Текст главного меню")
 
-    menu_btn_check = models.TextField(verbose_name="Кнопка - тревожная кнопка")
-    menu_btn_status = models.TextField(verbose_name="Кнопка - статус объекта")
-    menu_btn_logout = models.TextField(verbose_name="Кнопка - выйти")
-    menu_btn_login = models.TextField(verbose_name="Кнопка - авторизоваться")
+    menu_btn_check = models.CharField(max_length=128, verbose_name="Кнопка - тревожная кнопка")
+    menu_btn_status = models.CharField(max_length=128, verbose_name="Кнопка - статус объекта")
+    menu_btn_logout = models.CharField(max_length=128, verbose_name="Кнопка - выйти")
+    menu_btn_login = models.CharField(max_length=128, verbose_name="Кнопка - авторизоваться")
 
-    error_no_command = models.TextField(verbose_name="Текст неизвестной комманды")
+    error_no_command = models.TextField(verbose_name="Текст неизвестной команды")
 
     def __str__(self):
         return f"{self.language}"
