@@ -88,7 +88,7 @@ def handle_text(message):
 
 
 def check_login(potential_login):
-    return {}
+    return True
 
 
 def check_password_1(login, potential_password_1):
@@ -108,6 +108,7 @@ def temp_handle_text(message):
         return False
 
     temp_user = temp_base.get(message.from_user.id)
+    bot.send_message(temp_user["id"], temp_user)
 
     if temp_user["status"] == temp_base.LOGIN():
         if check_login(message.text):
@@ -127,7 +128,6 @@ def temp_handle_text(message):
             del temp_base[message.from_user.id]
             bot.send_message(temp_user["id"], "Авторизовал")
 
-    bot.send_message(temp_user["id"], temp_user)
     return True
 
 
