@@ -49,6 +49,11 @@ def start(message):
     bot.send_message(message.from_user.id, text_description, reply_markup=markup.auth())
 
 
+def data_incorrect(message):
+    markup = Markups("RU")
+    bot.send_message(message.from_user.id, markup.text.auth_text, reply_markup=markup.auth())
+
+
 @bot.callback_query_handler(func=lambda call: call.data == "auth")
 def callback_login(call: telebot.types.CallbackQuery):
     markup = Markups("RU")
@@ -65,7 +70,7 @@ def handle_text(message):
     if user_handle_text(message):
         return
 
-    start()
+    start(message)
 
 
 def temp_handle_text(message):
