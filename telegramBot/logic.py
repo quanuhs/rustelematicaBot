@@ -25,7 +25,7 @@ class Markups:
     def start_menu(self):
         keyboard = types.ReplyKeyboardMarkup(True, True)
         keyboard.row(self.text.menu_btn_status, self.text.menu_btn_check)
-        keyboard.row('Logout')
+        keyboard.row(self.text.menu_btn_logout)
         return keyboard
 
     def auth(self):
@@ -51,7 +51,8 @@ def start(message):
 
 @bot.callback_query_handler(func=lambda call: call.data == "auth")
 def callback_login(call: telebot.types.CallbackQuery):
-    bot.send_message(call.message.chat.id, "Введите логин")
+    markup = Markups("RU")
+    bot.send_message(call.message.chat.id, markup.text.auth_ask_panel_id)
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     UserInfo.objects.get_or_create(telegram_id=call.from_user.id, name=call.message.from_user.username or "unknown")
 
@@ -78,6 +79,11 @@ def temp_handle_text(message):
         return False
 
     error_message = None
+
+    if temp_user.panel_id:
+        bot.send_message(temp_user.telegram_id, api.check_panel_id(temp_user.panel_id))
+        if temp_user.status == UserInfo.USER_STATUS[1][0]:
+            bot.send_message(temp_user.telegram_id, api.check_panel_id(temp_user.panel_id).get("codechkts")==temp_user.codechkts)
 
     if temp_user.status == UserInfo.USER_STATUS[0][0]:
         if api.check_panel_id(int(message.text)) is None:
@@ -106,11 +112,17 @@ def temp_handle_text(message):
     if error_message:
         bot.send_message(temp_user.telegram_id, error_message)
         temp_user.delete()
-    else:
-        temp_user.save()
+        return False
+
+    temp_user.save()
 
     return True
 
 
 def user_handle_text(message):
-    bot.send_message(message.from_user.id, "we are here!")
+    temp_user: UserInfo = UserInfo.objects.filter(telegram_id=message.from_user.id).first()
+    markup = Markups("RU")
+
+    if temp_user is None:
+        return False
+
