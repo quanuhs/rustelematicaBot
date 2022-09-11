@@ -6,7 +6,7 @@ bot = telebot.TeleBot(token)
 
 
 def handle_message(request):
-    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+    bot.process_new_updates([telebot.types.Update.de_json(request.body.decode("utf-8"))])
 
 
 @bot.message_handler(content_types=['text'])
