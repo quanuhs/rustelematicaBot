@@ -108,7 +108,6 @@ def temp_handle_text(message):
         return False
 
     temp_user = temp_base.get(message.from_user.id)
-    bot.send_message(temp_user["id"], temp_user)
 
     if temp_user["status"] == temp_base.LOGIN():
         if check_login(message.text):
@@ -126,10 +125,12 @@ def temp_handle_text(message):
         if check_password_2(temp_user[temp_base.LOGIN()], temp_user[temp_base.PASSWORD_1()], message.text):
             create_user(temp_user)
             del temp_base[message.from_user.id]
-            bot.send_message(temp_user["id"], "Авторизовал")
+            bot.send_message(temp_user["id"], f"Авторизовал {temp_user[temp_base.LOGIN()]} | {temp_user[temp_base.PASSWORD_1()]} | {temp_user[temp_base.PASSWORD_2()]}")
 
     return True
 
 
 def user_handle_text(message):
-    bot.send_message(message.from_user.id, "cool")
+    return False
+
+
