@@ -8,6 +8,7 @@ class BotSettings(models.Model):
 
     bot_url = models.CharField(max_length=64, verbose_name="Ссылка на бота")
     token = models.CharField(max_length=128, verbose_name="Токен бота")
+    api_key = models.CharField(max_length=128, verbose_name="API ключ")
     webhook_secret = models.CharField(max_length=128, verbose_name="Код webhook")
 
     def __str__(self):
