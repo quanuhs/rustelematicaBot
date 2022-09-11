@@ -51,8 +51,9 @@ def start(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_login(call):
-    msg = bot.message_handler(call.message.chat.id, "Введите логин")
-    bot.register_next_step_handler(msg, login_entered)
+    bot.send_message(call.message.chat.id, "okey")
+    # msg = bot.message_handler(call.message.chat.id, "Введите логин")
+    # bot.register_next_step_handler(msg, login_entered)
 
 
 def login_entered(message):
