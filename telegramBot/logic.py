@@ -45,11 +45,13 @@ def handle_message(request, settings):
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = Markups("RU")
-    user, created = UserInfo.objects.get_or_create(telegram_id=message.from_user.id, name=message.from_user.username or "unknown")
+    user = UserInfo.objects.filter(telegram_id=message.from_user.id)
 
-    if not created and user.status == UserInfo.USER_STATUS[3][0]:
+    if user.status == UserInfo.USER_STATUS[3][0]:
         bot.send_message(user.telegram_id, markup.text.menu_text, reply_markup=markup.start_menu())
         return
+    else:
+        user.delete()
 
     text_description = markup.text.welcome_text
     bot.send_message(message.from_user.id, text_description, reply_markup=markup.auth())
