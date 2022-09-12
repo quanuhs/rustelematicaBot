@@ -1,3 +1,4 @@
+from operator import mod
 from django.db import models
 
 
@@ -77,6 +78,9 @@ class BotDictionary(models.Model):
     
     confirm_btn_yes = models.CharField(max_length=128, verbose_name="Кнопка - согласия/подтверждения")
     confirm_btn_no = models.CharField(max_length=128, verbose_name="Кнопка - отказа/отмены")
+    
+    alert_pressed = models.TextField(verbose_name="Текст - тревожная кнопка нажата")
+    alert_not_pressed = models.TextField(verbose_name="Текст - тревожная кнопка не нажата")
 
     
     

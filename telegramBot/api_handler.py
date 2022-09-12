@@ -32,7 +32,8 @@ class RustelematicaAPI():
             return None
     
     def check_test(self, cmd, panel_id: int, uuid_object, call_time_utc, expected_code):
-        data = self.get_test(cmd, panel_id, uuid_object, call_time_utc)
+        print(call_time_utc)
+        data = self.get_test(cmd, panel_id, uuid_object, int(call_time_utc.timestamp()))
         if data is None:
             return False
     

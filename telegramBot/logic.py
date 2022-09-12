@@ -36,8 +36,8 @@ class Markups:
     
     def agree_or_not(self):
         keyboard = types.InlineKeyboardMarkup()
-        keyboard.add(types.InlineKeyboardButton(text=self.text.menu_btn_login, callback_data="yes"))
-        keyboard.add(types.InlineKeyboardButton(text=self.text.menu_btn_login, callback_data="no"))
+        keyboard.add(types.InlineKeyboardButton(text=self.text.confirm_btn_yes, callback_data="yes"))
+        keyboard.add(types.InlineKeyboardButton(text=self.text.confirm_btn_no, callback_data="no"))
         return keyboard
 
 
@@ -152,14 +152,36 @@ def start_test(call):
         
         user.service_time = datetime.datetime.now(timezone.utc)
         api.get_data(2, user.panel_id, user.object_uuid)
+        user.save()
+        check_system(user, markup)
     
-        
     else:
         try:
-            bot.delete_message(call.message.chat.id, call.message_id)
-        except:
-            pass
+            bot.delete_message(call.message.chat.id, call.message.message_id)
+        except Exception as e:
+            print(e)
 
+
+def check_system(user, markup:Markups):
+    if user.service_time is None:
+            bot.send_message(user.telegram_id, markup.text.ask_turn_cmd2, reply_markup=markup.agree_or_not())
+            return
+        
+    time_differ = datetime.datetime.now(tz=timezone.utc) - user.service_time
+    
+    if time_differ.total_seconds() >= 60*4:
+        bot.send_message(user.telegram_id, markup.text.ask_turn_cmd2, reply_markup=markup.agree_or_not())
+        return
+    
+    if api.check_test(1, user.panel_id, user.object_uuid, user.service_time, 1201):
+        _text = markup.text.alert_pressed
+    else:
+        _text = markup.text.alert_not_pressed
+        
+    
+    bot.send_message(user.telegram_id, _text)
+    
+    
 
 def user_handle_text(message, markup:Markups):
     user: UserInfo = UserInfo.objects.filter(telegram_id=message.from_user.id, status=UserInfo.USER_STATUS[3][0]).first()
@@ -169,17 +191,7 @@ def user_handle_text(message, markup:Markups):
         return False
     
     if message.text == markup.text.menu_btn_check:
-        time_differ = datetime.datetime.now(tz=timezone.utc) - user.service_time
-        if time_differ.total_seconds() >= 60*4:
-            bot.send_message(user.telegram_id, markup.text.ask_turn_cmd2, reply_markup=markup.agree_or_not())
-            return
-    
-        if api.check_test(1, user.panel_id, user.object_uuid, user.service_time, 1201):
-            _text = markup.text.confirm_btn_yes
-        else:
-            _text = markup.text.confirm_btn_no
-        
-        bot.send_message(user.telegram_id, _text)
+        check_system(user, markup)
             
     
     elif message.text == markup.text.menu_btn_status:
