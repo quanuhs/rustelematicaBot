@@ -33,6 +33,12 @@ class Markups:
         button = types.InlineKeyboardButton(text=self.text.menu_btn_login, callback_data="auth")
         keyboard.add(button)
         return keyboard
+    
+    def agree_or_not(self):
+        keyboard = types.InlineKeyboardMarkup()
+        keyboard.add(types.InlineKeyboardButton(text=self.text.menu_btn_login, callback_data="yes"))
+        keyboard.add(types.InlineKeyboardButton(text=self.text.menu_btn_login, callback_data="no"))
+        return keyboard
 
 
 def handle_message(request, settings):
@@ -128,6 +134,31 @@ def temp_handle_text(message, markup:Markups):
 
     return True
 
+import datetime
+from datetime import timezone
+@bot.callback_query_handler(func=lambda call: call.data == "yes" or call.data == "no")
+def start_test(call):
+    markup = Markups("RU")
+    user: UserInfo = UserInfo.objects.filter(telegram_id=call.from_user.id, status=UserInfo.USER_STATUS[3][0]).first()
+    if user is None:
+        return
+    
+    if call.data == "yes":
+        try:
+            bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
+        except:
+            bot.send_message(user.telegram_id, markup.text.ask_turn_cmd2, reply_markup=markup.agree_or_not())
+            return
+        
+        user.service_time = datetime.datetime.now(timezone.utc)
+        api.get_data(2, user.panel_id, user.object_uuid)
+    
+        
+    else:
+        try:
+            bot.delete_message(call.message.chat.id, call.message_id)
+        except:
+            pass
 
 
 def user_handle_text(message, markup:Markups):
@@ -138,7 +169,18 @@ def user_handle_text(message, markup:Markups):
         return False
     
     if message.text == markup.text.menu_btn_check:
-        bot.send_message(user.telegram_id, markup.text.menu_btn_check)
+        time_differ = datetime.datetime.now(tz=timezone.utc) - user.service_time
+        if time_differ.total_seconds() >= 60*4:
+            bot.send_message(user.telegram_id, markup.text.ask_turn_cmd2, reply_markup=markup.agree_or_not())
+            return
+    
+        if api.check_test(1, user.panel_id, user.object_uuid, user.service_time, 1201):
+            _text = markup.text.confirm_btn_yes
+        else:
+            _text = markup.text.confirm_btn_no
+        
+        bot.send_message(user.telegram_id, _text)
+            
     
     elif message.text == markup.text.menu_btn_status:
         if api.get_data(1, user.panel_id, user.object_uuid).get("guardstate"):
@@ -146,6 +188,8 @@ def user_handle_text(message, markup:Markups):
         else:
             _text = markup.text.area_insecure
         bot.send_message(user.telegram_id, _text)
+    
+    
     
     elif message.text == markup.text.menu_btn_logout:
         msg = bot.send_message(user.telegram_id, "logout", reply_markup=telebot.types.ReplyKeyboardRemove())

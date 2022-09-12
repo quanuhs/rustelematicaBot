@@ -20,6 +20,27 @@ class RustelematicaAPI():
             return result.json()[0]
         except json.decoder.JSONDecodeError:
             return None
+    
+    def get_test(self, cmd, panel_id: int, uuid_object, call_time_utc):
+        result = requests.post(self.url,
+                               data={"apikey": self.api_key, "cmd": cmd, "panelid": panel_id, "idobject": uuid_object,
+                                     "calltime": call_time_utc})
+
+        try:
+            return result.json()
+        except json.decoder.JSONDecodeError:
+            return None
+    
+    def check_test(self, cmd, panel_id: int, uuid_object, call_time_utc, expected_code):
+        data = self.get_test(cmd, panel_id, uuid_object, call_time_utc)
+        if data is None:
+            return False
+    
+        for result in data:
+            if result.get("messagecode") == expected_code:
+                return True
+        
+        return False
 
     def set_api(self, api_key):
         self.api_key = api_key
