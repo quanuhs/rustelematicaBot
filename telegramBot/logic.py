@@ -153,7 +153,6 @@ def start_test(call):
         user.service_time = datetime.datetime.now(timezone.utc)
         api.get_data(2, user.panel_id, user.object_uuid)
         user.save()
-        check_system(user, markup)
     
     else:
         try:
