@@ -19,7 +19,7 @@ class Markups:
         self.language = language
 
     @property
-    def text(self):
+    def text(self) -> BotDictionary:
         return BotDictionary.objects.filter(language=self.language).first()
 
     def start_menu(self):
@@ -94,7 +94,7 @@ def temp_handle_text(message):
     error_message = None
 
     if temp_user.status == UserInfo.USER_STATUS[0][0]:
-        if api.check_panel_id(int(message.text)) is None:
+        if api.check_panel_id(message.text) is None:
             error_message = markup.text.auth_fail_panel_id
         else:
             temp_user.panel_id = int(message.text)
@@ -128,10 +128,21 @@ def temp_handle_text(message):
 
 
 def user_handle_text(message):
-    temp_user: UserInfo = UserInfo.objects.filter(telegram_id=message.from_user.id).first()
+    user: UserInfo = UserInfo.objects.filter(telegram_id=message.from_user.id).first()
     markup = Markups("RU")
 
-    if temp_user is None:
+    if user is None:
         return False
+    
+    if message.text == markup.text.menu_btn_check:
+        bot.send_message(user.telegram_id, markup.text.menu_btn_check)
+    
+    elif message.text == markup.text.menu_btn_status:
+        bot.send_message(user.telegram_id, markup.text.menu_btn_status)
+    
+    elif message.text == markup.text.menu_btn_logout:
+        user.delete()
+        return False
+        
 
     return True

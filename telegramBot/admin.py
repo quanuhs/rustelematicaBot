@@ -29,3 +29,5 @@ class BotSettingsAdmin(admin.ModelAdmin):
 @admin.register(UserInfo)
 class UserInfoAdmin(admin.ModelAdmin):
     pass
+
+admin.site.site_header = 'RustelematicaBot Panel'
