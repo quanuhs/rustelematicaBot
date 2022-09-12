@@ -14,6 +14,9 @@ class BotDictionaryAdmin(admin.ModelAdmin):
         ('Главное меню', {
             'fields': ['menu_text', 'menu_btn_check', 'menu_btn_status', 'menu_btn_logout']
         }),
+        ('Статусы', {
+            'fields': ['area_secure', 'area_insecure', 'ask_turn_cmd2', 'confirm_btn_yes', 'confirm_btn_no'],
+        }),
         ('Прочее', {
             'fields': ['welcome_text', 'error_no_command']
         })

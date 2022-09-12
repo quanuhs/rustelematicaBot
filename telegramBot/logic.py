@@ -23,7 +23,7 @@ class Markups:
         return BotDictionary.objects.filter(language=self.language).first()
 
     def start_menu(self):
-        keyboard = types.ReplyKeyboardMarkup(True, True)
+        keyboard = types.ReplyKeyboardMarkup(True, False)
         keyboard.row(self.text.menu_btn_status, self.text.menu_btn_check)
         keyboard.row(self.text.menu_btn_logout)
         return keyboard
@@ -72,18 +72,18 @@ def callback_login(call: telebot.types.CallbackQuery):
 
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
-    if temp_handle_text(message):
-        return
-
-    if user_handle_text(message):
-        return
-
-    start(message)
-
-
-def temp_handle_text(message):
-    temp_user: UserInfo = UserInfo.objects.filter(telegram_id=message.from_user.id).first()
     markup = Markups("RU")
+    if temp_handle_text(message, markup):
+        return
+
+    if user_handle_text(message, markup):
+        return
+
+    bot.send_message(message.from_user.id, markup.text.auth_text, reply_markup=markup.auth())
+
+
+def temp_handle_text(message, markup:Markups):
+    temp_user: UserInfo = UserInfo.objects.filter(telegram_id=message.from_user.id).first()
 
     if temp_user is None:
         return False
@@ -110,11 +110,13 @@ def temp_handle_text(message):
             bot.send_message(temp_user.telegram_id, markup.text.auth_ask_codechstate)
 
     elif temp_user.status == UserInfo.USER_STATUS[2][0]:
-        if api.check_codechstate(temp_user.panel_id, message.text) is None:
+        data = api.check_codechstate(temp_user.panel_id, message.text)
+        if data is None:
             error_message = markup.text.auth_fail_codechstate
         else:
             temp_user.codechstate = message.text
             temp_user.status = UserInfo.USER_STATUS[3][0]
+            temp_user.object_uuid = data.get("idobject")
             bot.send_message(temp_user.telegram_id, markup.text.auth_success, reply_markup=markup.start_menu())
 
     if error_message:
@@ -127,8 +129,9 @@ def temp_handle_text(message):
     return True
 
 
-def user_handle_text(message):
-    user: UserInfo = UserInfo.objects.filter(telegram_id=message.from_user.id).first()
+
+def user_handle_text(message, markup:Markups):
+    user: UserInfo = UserInfo.objects.filter(telegram_id=message.from_user.id, status=UserInfo.USER_STATUS[3][0]).first()
     markup = Markups("RU")
 
     if user is None:
@@ -138,11 +141,17 @@ def user_handle_text(message):
         bot.send_message(user.telegram_id, markup.text.menu_btn_check)
     
     elif message.text == markup.text.menu_btn_status:
-        bot.send_message(user.telegram_id, markup.text.menu_btn_status)
+        if api.get_data(1, user.panel_id, user.object_uuid).get("guardstate"):
+            _text = markup.text.area_secure
+        else:
+            _text = markup.text.area_insecure
+        bot.send_message(user.telegram_id, _text)
     
     elif message.text == markup.text.menu_btn_logout:
+        msg = bot.send_message(user.telegram_id, "logout", reply_markup=telebot.types.ReplyKeyboardRemove())
+        bot.send_message(user.telegram_id, markup.text.auth_text, reply_markup=markup.auth())
+        bot.delete_message(user.telegram_id, msg.message_id)
         user.delete()
-        return False
         
 
     return True

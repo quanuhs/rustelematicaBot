@@ -1,5 +1,7 @@
 import requests
 import json
+from datetime import timezone
+import datetime
 
 """ Handles API """
 
@@ -22,8 +24,8 @@ class RustelematicaAPI():
     def set_api(self, api_key):
         self.api_key = api_key
 
-    def check_panel_id(self, panel_id:str):
-        if not panel_id.isnumeric():
+    def check_panel_id(self, panel_id):
+        if not str(panel_id).isnumeric():
             return None
         
         return self.get_data(1, int(panel_id))

@@ -70,6 +70,16 @@ class BotDictionary(models.Model):
     menu_btn_login = models.CharField(max_length=128, verbose_name="Кнопка - авторизоваться")
 
     error_no_command = models.TextField(verbose_name="Текст неизвестной команды")
+    area_secure = models.TextField(verbose_name="Текст - объект на охране")
+    area_insecure = models.TextField(verbose_name="Текст - объекта не на охране")
+    
+    ask_turn_cmd2 = models.TextField(verbose_name="Текст (вопрос) - запустить режим тестирования")
+    
+    confirm_btn_yes = models.CharField(max_length=128, verbose_name="Кнопка - согласия/подтверждения")
+    confirm_btn_no = models.CharField(max_length=128, verbose_name="Кнопка - отказа/отмены")
+
+    
+    
 
     def __str__(self):
         return f"{self.language}"
