@@ -18,7 +18,7 @@ class RustelematicaAPI():
                                      "calltime": call_time_utc})
 
         try:
-            if len(result.json()) == 0:
+            if len(result.json()[0]) == 0:
                 return None
             
             return result.json()[0]
