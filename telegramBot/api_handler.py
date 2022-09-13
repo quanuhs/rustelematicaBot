@@ -17,7 +17,11 @@ class RustelematicaAPI():
                                      "calltime": call_time_utc})
 
         try:
-            return result.json()[0] or None
+            res = result.json()[0]
+            if len(res) == 0:
+                return None
+            return res
+        
         except json.decoder.JSONDecodeError:
             return None
     
