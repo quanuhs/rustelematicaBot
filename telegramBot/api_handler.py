@@ -18,7 +18,7 @@ class RustelematicaAPI():
 
         try:
             return result.json()[0]
-        except json.decoder.JSONDecodeError:
+        except Exception:
             return None
     
     def get_test(self, cmd, panel_id: int, uuid_object, call_time_utc):
@@ -28,7 +28,7 @@ class RustelematicaAPI():
 
         try:
             return result.json()
-        except json.decoder.JSONDecodeError:
+        except Exception:
             return None
     
     def check_test(self, cmd, panel_id: int, uuid_object, call_time_utc, expected_code):
