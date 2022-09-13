@@ -1,3 +1,4 @@
+from subprocess import call
 import requests
 import json
 from datetime import timezone
@@ -17,19 +18,14 @@ class RustelematicaAPI():
                                      "calltime": call_time_utc})
 
         try:
-            return result.json()[0]
-        except Exception:
-            return None
+            return result.json()
+        except json.decoder.JSONDecodeError:
+            return "F"
+    
     
     def get_test(self, cmd, panel_id: int, uuid_object, call_time_utc):
-        result = requests.post(self.url,
-                               data={"apikey": self.api_key, "cmd": cmd, "panelid": panel_id, "idobject": uuid_object,
-                                     "calltime": call_time_utc})
-
-        try:
-            return result.json()
-        except Exception:
-            return None
+        return self.get_data(cmd, panel_id, uuid_object, call_time_utc)
+    
     
     def check_test(self, cmd, panel_id: int, uuid_object, call_time_utc, expected_code):
         print(call_time_utc)
@@ -43,6 +39,7 @@ class RustelematicaAPI():
         
         return False
 
+
     def set_api(self, api_key):
         self.api_key = api_key
 
@@ -50,7 +47,7 @@ class RustelematicaAPI():
         if not str(panel_id).isnumeric():
             return None
         
-        return self.get_data(1, int(panel_id))
+        return self.get_data(1, int(str(panel_id)))
 
     def check_codechkts(self, panel_id: int, codechkts):
         data = self.check_panel_id(panel_id)
