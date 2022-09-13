@@ -100,6 +100,7 @@ def temp_handle_text(message, markup:Markups):
     error_message = None
 
     if temp_user.status == UserInfo.USER_STATUS[0][0]:
+        bot.send_message(temp_user.telegram_id, str(dict(api.check_panel_id(message.text))))
         if api.check_panel_id(message.text) is None:
             error_message = markup.text.auth_fail_panel_id
         else:
