@@ -15,7 +15,7 @@ class BotDictionaryAdmin(admin.ModelAdmin):
             'fields': ['menu_text', 'menu_btn_check', 'menu_btn_status', 'menu_btn_logout']
         }),
         ('Статусы', {
-            'fields': ['area_secure', 'area_insecure', 'ask_turn_cmd2', 'test_is_on', 'alert_pressed', 'alert_not_pressed', 'confirm_btn_yes', 'confirm_btn_no'],
+            'fields': ['area_secure', 'area_insecure', 'ask_turn_cmd2', 'test_is_on', 'test_error', 'alert_pressed', 'alert_not_pressed', 'confirm_btn_yes', 'confirm_btn_no'],
         }),
         ('Прочее', {
             'fields': ['welcome_text', 'error_no_command']
