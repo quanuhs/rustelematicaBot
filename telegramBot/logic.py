@@ -160,10 +160,12 @@ def start_test(call):
             bot.send_message(user.telegram_id, markup.text.ask_turn_cmd2, reply_markup=markup.agree_or_not())
             return
         
-        user.service_time = datetime.datetime.now(timezone.utc)
-        api.get_data(2, user.panel_id, user.object_uuid)
-        user.save()
-        bot.send_message(user.telegram_id, markup.text.test_is_on)
+        if api.set_test_mode(user.panel_id, user.object_uuid, 0, True):
+            user.service_time = datetime.datetime.now(timezone.utc)
+            user.save()
+            bot.send_message(user.telegram_id, markup.text.test_is_on)
+        else:
+            bot.send_message(user.telegram_id, markup.text.test_error)
     
     else:
         try:

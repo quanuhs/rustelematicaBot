@@ -24,6 +24,17 @@ class RustelematicaAPI():
         except Exception as e:
             return None
     
+    def set_test_mode(self, panel_id: int, uuid_object, phone, mode:bool):
+        result = requests.post(self.url,
+                               data={"apikey": self.api_key, "mode": mode, "phone": phone, "panelid": panel_id, "idobject": uuid_object,})
+
+        try:
+                        
+            return result.json()[0]
+        
+        except Exception as e:
+            return None
+    
     
     def get_test(self, cmd, panel_id: int, uuid_object, call_time_utc):
         return self.get_data(cmd, panel_id, uuid_object, call_time_utc)
