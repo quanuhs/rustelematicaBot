@@ -30,7 +30,7 @@ class RustelematicaAPI():
 
         try:
                         
-            return result.json()[0]
+            return result.json()
         
         except Exception as e:
             return None
