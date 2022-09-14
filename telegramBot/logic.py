@@ -4,6 +4,9 @@ from .api_handler import RustelematicaAPI
 
 from .models import BotDictionary, UserInfo
 
+import datetime
+from datetime import timezone
+
 
 class TelegramBot(telebot.TeleBot):
     def set_token(self, new_token):
@@ -41,11 +44,15 @@ class Markups:
         return keyboard
 
 
+
+
 def handle_message(request, settings):
     bot.set_token(settings.token)
     api.set_api(settings.api_key)
 
     bot.process_new_updates([telebot.types.Update.de_json(request.body.decode("utf-8"))])
+
+
 
 
 @bot.message_handler(commands=['start'])
@@ -64,6 +71,7 @@ def start(message):
     bot.send_message(message.from_user.id, text_description, reply_markup=markup.auth())
 
 
+
 @bot.callback_query_handler(func=lambda call: call.data == "auth")
 def callback_login(call: telebot.types.CallbackQuery):
     markup = Markups("RU")
@@ -76,6 +84,7 @@ def callback_login(call: telebot.types.CallbackQuery):
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
 
 
+
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
     markup = Markups("RU")
@@ -86,6 +95,7 @@ def handle_text(message):
         return
 
     bot.send_message(message.from_user.id, markup.text.auth_text, reply_markup=markup.auth())
+
 
 
 def temp_handle_text(message, markup:Markups):
@@ -134,8 +144,8 @@ def temp_handle_text(message, markup:Markups):
 
     return True
 
-import datetime
-from datetime import timezone
+
+
 @bot.callback_query_handler(func=lambda call: call.data == "yes" or call.data == "no")
 def start_test(call):
     markup = Markups("RU")
@@ -153,12 +163,14 @@ def start_test(call):
         user.service_time = datetime.datetime.now(timezone.utc)
         api.get_data(2, user.panel_id, user.object_uuid)
         user.save()
+        bot.send_message(user.telegram_id, markup.text.test_is_on)
     
     else:
         try:
             bot.delete_message(call.message.chat.id, call.message.message_id)
         except Exception as e:
             print(e)
+
 
 
 def check_system(user, markup:Markups):

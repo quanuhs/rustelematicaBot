@@ -75,6 +75,7 @@ class BotDictionary(models.Model):
     area_insecure = models.TextField(verbose_name="Текст - объекта не на охране")
     
     ask_turn_cmd2 = models.TextField(verbose_name="Текст (вопрос) - запустить режим тестирования")
+    test_is_on = models.TextField(verbose_name="Текст включения тестирования")
     
     confirm_btn_yes = models.CharField(max_length=128, verbose_name="Кнопка - согласия/подтверждения")
     confirm_btn_no = models.CharField(max_length=128, verbose_name="Кнопка - отказа/отмены")
