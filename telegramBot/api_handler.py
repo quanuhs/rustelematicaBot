@@ -33,7 +33,7 @@ class RustelematicaAPI():
             return result.json()
         
         except Exception as e:
-            return None
+            return {}
     
     
     def get_test(self, cmd, panel_id: int, uuid_object, call_time_utc):
