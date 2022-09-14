@@ -26,7 +26,7 @@ class RustelematicaAPI():
     
     def set_test_mode(self, panel_id: int, uuid_object, phone, mode:bool):
         result = requests.post(self.url,
-                               data={"apikey": self.api_key, "mode": mode, "phone": phone, "panelid": panel_id, "idobject": uuid_object,})
+                               data={"apikey": self.api_key, "cmd": 2, "mode": mode, "phone": phone, "panelid": panel_id, "idobject": uuid_object,})
 
         try:
                         
