@@ -11,18 +11,25 @@ class RustelematicaAPI():
     def __init__(self, api_key):
         self.api_key = api_key
         self.url = "https://desk2.rustelematika.ru/api/asterix/masg.php"
-
-    def get_data(self, cmd, panel_id: int, uuid_object=None, call_time_utc=None):
+    
+    def make_request(self, cmd, panel_id: int, uuid_object=None, call_time_utc=None):
         result = requests.post(self.url,
                                data={"apikey": self.api_key, "cmd": cmd, "panelid": panel_id, "idobject": uuid_object,
                                      "calltime": call_time_utc})
-
+        
         try:
                         
-            return result.json()[0]
+            return result.json()
         
         except Exception as e:
             return None
+            
+
+    def get_data(self, cmd, panel_id: int, uuid_object=None, call_time_utc=None):
+        result = self.make_request(cmd, panel_id, uuid_object, call_time_utc)
+        if result:
+            return result[0]
+        
     
     def set_test_mode(self, panel_id: int, uuid_object, phone, mode:bool):
         result = requests.post(self.url,
@@ -36,13 +43,9 @@ class RustelematicaAPI():
             return {}
     
     
-    def get_test(self, cmd, panel_id: int, uuid_object, call_time_utc):
-        return self.get_data(cmd, panel_id, uuid_object, call_time_utc)
-    
-    
     def check_test(self, cmd, panel_id: int, uuid_object, call_time_utc, expected_code):
-        print(call_time_utc)
-        data = self.get_test(cmd, panel_id, uuid_object, int(call_time_utc.timestamp()))
+        data = self.make_request(cmd, panel_id, uuid_object, int(call_time_utc.timestamp()))
+        
         if data is None:
             return False
     
