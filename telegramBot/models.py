@@ -1,8 +1,7 @@
 from operator import mod
+from pyexpat import model
 from django.db import models
 
-
-# Create your models here.
 
 class BotSettings(models.Model):
     """Модель настройки Telegram бота"""
@@ -11,6 +10,8 @@ class BotSettings(models.Model):
     token = models.CharField(max_length=128, verbose_name="Токен бота")
     api_key = models.CharField(max_length=128, verbose_name="API ключ")
     webhook_secret = models.CharField(max_length=128, verbose_name="Код webhook")
+    
+    allowed_tries = models.IntegerField(default=3, verbose_name="Разрешенное количество попыток ввода данных")
 
     def __str__(self):
         return f"{self.webhook_secret}"
@@ -24,21 +25,38 @@ class UserInfo(models.Model):
     telegram_id = models.CharField(verbose_name="id пользователя в Telegram", max_length=16)
     name = models.CharField(verbose_name="Имя пользователя в Telegram", max_length=32)
 
-    panel_id = models.IntegerField(verbose_name="panelid для работы с API", null=True)
-    codechkts = models.TextField(verbose_name="codechkts для работы с API", null=True)
-    codechstate = models.TextField(verbose_name="codechstate для работы с API", null=True)
-    object_uuid = models.TextField(verbose_name="object_uuid для работы с API", null=True)
-    service_time = models.DateTimeField(verbose_name="Время начала тестирования", null=True)
+    panel_id = models.IntegerField(verbose_name="panelid для работы с API", null=True, blank=True)
+    codechkts = models.TextField(verbose_name="codechkts для работы с API", null=True, blank=True)
+    codechstate = models.TextField(verbose_name="codechstate для работы с API", null=True, blank=True)
+    object_uuid = models.TextField(verbose_name="object_uuid для работы с API", null=True, blank=True)
+    service_time = models.DateTimeField(verbose_name="Время начала тестирования", null=True, blank=True)
+    
+    errors_before_delete = models.IntegerField(verbose_name="Ошибок ввода", null=False, default=0)
+    ban_time = models.DateTimeField(verbose_name="Время до конца бана", null=True, blank=True)
 
     USER_STATUS = (
         ('pending_login', 'Ожидаем ввода логина'),
         ('pending_password_1', 'Ожидаем ввод codechkts'),
         ('pending_password_2', 'Ожидаем ввод codechstate'),
-        ('active', "Авторизованный")
+        ('active', "Авторизованный"),
+        ('banned', "Заблокирован")
     )
 
-    status = models.CharField(choices=USER_STATUS, max_length=32, verbose_name='Статус', default=USER_STATUS[0][0])
+    status = models.CharField(choices=USER_STATUS, max_length=32, verbose_name='Статус', default=None, null=True, blank=True)
 
+    def change_status(self, new_status, refresh_errors:bool=True):
+        self.status = new_status
+        if refresh_errors:
+            self.errors_before_delete = 0
+        
+        if self.status == None:
+            self.panel_id = None
+            self.codechkts = None
+            self.codechstate = None
+            self.object_uuid = None
+            
+        self.save()
+    
     def __str__(self):
         return f"{self.telegram_id} | {self.name} > {self.panel_id}"
 
@@ -86,9 +104,9 @@ class BotDictionary(models.Model):
 
     
     
-
     def __str__(self):
         return f"{self.language}"
+    
 
     class Meta:
         verbose_name = "Справочник"

@@ -24,6 +24,10 @@ class RustelematicaAPI():
         except Exception as e:
             return None
             
+    def validate_user_data(self, panel_id, codechkts, codechstate):
+        data = self.check_panel_id(panel_id)
+        return self.check_codechkts(panel_id, codechkts, data) != None and self.check_codechstate(panel_id, codechstate, data) != None
+        
 
     def get_data(self, cmd, panel_id: int, uuid_object=None, call_time_utc=None):
         result = self.make_request(cmd, panel_id, uuid_object, call_time_utc)
@@ -65,8 +69,10 @@ class RustelematicaAPI():
         
         return self.get_data(1, int(str(panel_id)))
 
-    def check_codechkts(self, panel_id: int, codechkts):
-        data = self.check_panel_id(panel_id)
+    def check_codechkts(self, panel_id: int, codechkts, data=None):
+        
+        if data is None:
+            data = self.check_panel_id(panel_id)
         if data is None:
             return None
 
@@ -75,8 +81,9 @@ class RustelematicaAPI():
 
         return None
 
-    def check_codechstate(self, panel_id: int, codechstate):
-        data = self.check_panel_id(panel_id)
+    def check_codechstate(self, panel_id: int, codechstate, data=None):
+        if data is None:
+            data = self.check_panel_id(panel_id)
         if data is None:
             return None
 
