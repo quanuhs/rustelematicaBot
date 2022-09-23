@@ -6,6 +6,9 @@ from .models import BotDictionary, UserInfo
 
 import datetime
 from datetime import date, timezone
+import asyncio
+from asgiref.sync import async_to_sync
+
 
 
 class TelegramBot(telebot.TeleBot):
@@ -42,6 +45,23 @@ class Markups:
         keyboard.add(types.InlineKeyboardButton(text=self.text.confirm_btn_yes, callback_data="yes"))
         keyboard.add(types.InlineKeyboardButton(text=self.text.confirm_btn_no, callback_data="no"))
         return keyboard
+    
+
+async def check_test_button(user: UserInfo, button_pressed_text, button_not_pressed_text, sleep_time_sec:float=3.0, times: int=3):
+    _text = button_not_pressed_text
+    for i in range(times):
+        if not is_auth_user(user):
+            return
+        
+        if api.check_test(1, user.panel_id, user.object_uuid, user.service_time, 1201):
+            _text = button_pressed_text
+            break
+        else:
+            await asyncio.sleep(sleep_time_sec)
+
+    bot.send_message(user.telegram_id, _text)
+    return True
+    
 
 
 def is_auth_user(user:UserInfo):
@@ -108,9 +128,14 @@ def handle_callback(call: telebot.types.CallbackQuery):
     user, created = UserInfo.objects.get_or_create(telegram_id=call.from_user.id, name=call.from_user.username or "unknown")
     markup = Markups("RU")
     
+    try:
+        bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
+    except Exception:
+        pass
+    
 
     if is_user_banned(user):
-        bot.send_message(call.message.chat.id, "banned")
+        bot.send_message(call.message.chat.id, get_ban_message(user, markup))
     
     elif call.data == "auth":
         user.change_status(UserInfo.USER_STATUS[0][0], False)
@@ -121,13 +146,15 @@ def handle_callback(call: telebot.types.CallbackQuery):
         
     elif call.data == "no":
         bot.delete_message(call.message.chat.id, call.message.message_id)
-
-    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
-        
+    
 
 def ask_login(chat_id, markup):
     bot.send_message(chat_id, markup.text.auth_ask_panel_id)
 
+def get_ban_message(user:UserInfo, markup):
+    time_differ = user.ban_time - datetime.datetime.now(tz=timezone.utc)
+    _text = max(round(time_differ.total_seconds()), 0)
+    return f"{markup.text.user_banned} {_text} {markup.text.user_banned_second}"
 
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
@@ -135,7 +162,7 @@ def handle_text(message):
     markup = Markups("RU")
     
     if is_user_banned(user):
-        bot.send_message(user.telegram_id, "Your are banned!")
+        bot.send_message(user.telegram_id, get_ban_message(user, markup))
         return
     
     
@@ -149,7 +176,7 @@ def handle_text(message):
     temp_handle_text(message, markup, user)
     
     if is_user_banned(user):
-        bot.send_message(user.telegram_id, "Your are banned!")
+        bot.send_message(user.telegram_id, get_ban_message(user, markup))
     
         
 
@@ -240,19 +267,28 @@ def start_test(user, markup):
     if not is_auth_user(user):
         return False
     
-    bot.send_message(user.telegram_id, markup.text.ask_turn_cmd2, reply_markup=markup.agree_or_not())
-    
     if api.set_test_mode(user.panel_id, user.object_uuid, 0, True).get("servicemode"):
         user.service_time = datetime.datetime.now(timezone.utc)
         user.save()
         bot.send_message(user.telegram_id, markup.text.test_is_on)
+        
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        
+        task = loop.create_task(check_test_button(user, markup.text.alert_pressed, markup.text.alert_not_pressed))
+        loop.run_until_complete(task)
+        loop.close()
+    
     else:
         bot.send_message(user.telegram_id, markup.text.test_error)
 
 
 
 
-def check_system(user, markup:Markups):
+def check_system(user:UserInfo, markup:Markups):
     """
     Проверяет тревожную кнопку объекта
     Если время последний запуск тестирования был более 4 минут назад
@@ -271,7 +307,7 @@ def check_system(user, markup:Markups):
     if time_differ.total_seconds() >= 60*4:
         bot.send_message(user.telegram_id, markup.text.ask_turn_cmd2, reply_markup=markup.agree_or_not())
         return
-    
+
     if api.check_test(1, user.panel_id, user.object_uuid, user.service_time, 1201):
         _text = markup.text.alert_pressed
     else:
@@ -279,3 +315,4 @@ def check_system(user, markup:Markups):
         
     
     bot.send_message(user.telegram_id, _text)
+

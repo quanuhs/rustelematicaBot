@@ -102,11 +102,12 @@ class BotDictionary(models.Model):
     alert_pressed = models.TextField(verbose_name="Текст - тревожная кнопка нажата")
     alert_not_pressed = models.TextField(verbose_name="Текст - тревожная кнопка не нажата")
 
+    user_banned = models.TextField(verbose_name="Текст - вы временно заблокированы")
+    user_banned_second = models.TextField(verbose_name="Текст - секунд", default="секунд")
     
     
     def __str__(self):
         return f"{self.language}"
-    
 
     class Meta:
         verbose_name = "Справочник"
