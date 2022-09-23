@@ -31,7 +31,7 @@ class UserInfo(models.Model):
     object_uuid = models.TextField(verbose_name="object_uuid для работы с API", null=True, blank=True)
     service_time = models.DateTimeField(verbose_name="Время начала тестирования", null=True, blank=True)
     
-    errors_before_delete = models.IntegerField(verbose_name="Ошибок ввода", null=False, default=0)
+    errors_before_ban = models.IntegerField(verbose_name="Ошибок ввода", null=False, default=0)
     ban_time = models.DateTimeField(verbose_name="Время до конца бана", null=True, blank=True)
 
     USER_STATUS = (
@@ -47,15 +47,18 @@ class UserInfo(models.Model):
     def change_status(self, new_status, refresh_errors:bool=True):
         self.status = new_status
         if refresh_errors:
-            self.errors_before_delete = 0
+            self.errors_before_ban = 0
         
         if self.status == None:
-            self.panel_id = None
-            self.codechkts = None
-            self.codechstate = None
-            self.object_uuid = None
+            self.clear_data()
             
         self.save()
+    
+    def clear_data(self):
+        self.panel_id = None
+        self.codechkts = None
+        self.codechstate = None
+        self.object_uuid = None
     
     def __str__(self):
         return f"{self.telegram_id} | {self.name} > {self.panel_id}"

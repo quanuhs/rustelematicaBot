@@ -89,9 +89,10 @@ def is_user_banned(user:UserInfo):
     if user is None:
         return False
 
-    if user.errors_before_delete >= 3:
+    if user.errors_before_ban >= 3:
         user.change_status(UserInfo.USER_STATUS[4][0])
         user.ban_time = datetime.datetime.now(timezone.utc) + datetime.timedelta(minutes=5)
+        user.clear_data()
         user.save()
 
     if user.status != UserInfo.USER_STATUS[4][0]:
@@ -212,9 +213,7 @@ def temp_handle_text(message, markup, temp_user):
 
     if error_message:
         bot.send_message(temp_user.telegram_id, error_message, reply_markup=markup.auth())
-        temp_user.errors_before_delete += 1
-        #temp_user.delete()
-        #return True
+        temp_user.errors_before_ban += 1
 
     temp_user.save()
     return True
