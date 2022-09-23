@@ -9,7 +9,7 @@ class BotDictionaryAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Авторизация', {
             'fields': ['auth_text', 'auth_success', 'auth_ask_panel_id', 'auth_fail_panel_id', 'auth_ask_codechkts',
-                       'auth_fail_codechkts', 'auth_ask_codechstate', 'auth_fail_codechstate', 'menu_btn_login']
+                       'auth_fail_codechkts', 'auth_ask_codechstate', 'auth_fail_codechstate', 'menu_btn_login', "user_banned"]
         }),
         ('Главное меню', {
             'fields': ['menu_text', 'menu_btn_check', 'menu_btn_status', 'menu_btn_logout']
@@ -18,7 +18,7 @@ class BotDictionaryAdmin(admin.ModelAdmin):
             'fields': ['area_secure', 'area_insecure', 'ask_turn_cmd2', 'test_is_on', 'test_error', 'alert_pressed', 'alert_not_pressed', 'confirm_btn_yes', 'confirm_btn_no'],
         }),
         ('Прочее', {
-            'fields': ['welcome_text', 'error_no_command']
+            'fields': ['welcome_text', 'error_no_command', "user_banned_second"]
         })
     )
     exclude = ['language']
