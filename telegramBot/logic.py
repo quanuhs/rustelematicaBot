@@ -1,13 +1,13 @@
+from ast import Return
 import telebot
 from telebot import types
 from .api_handler import RustelematicaAPI
 
-from .models import BotDictionary, UserInfo
+from .models import BotDictionary, BotSettings, UserInfo
 
 import datetime
 from datetime import date, timezone
 import asyncio
-from asgiref.sync import async_to_sync
 
 
 
@@ -89,7 +89,11 @@ def is_user_banned(user:UserInfo):
     if user is None:
         return False
 
-    if user.errors_before_ban >= 3:
+    settings = BotSettings.objects.filter().first()
+    if settings is None:
+        Return
+
+    if user.errors_before_ban >= settings.allowed_tries:
         user.change_status(UserInfo.USER_STATUS[4][0])
         user.ban_time = datetime.datetime.now(timezone.utc) + datetime.timedelta(minutes=5)
         user.clear_data()
