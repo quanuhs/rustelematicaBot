@@ -12,8 +12,13 @@ import asyncio
 
 
 class TelegramBot(telebot.TeleBot):
+    settings = None
+    
     def set_token(self, new_token):
         self.token = new_token
+    
+    def set_settings(self, settings):
+        self.settings = settings
 
 
 bot: TelegramBot = TelegramBot(None)
@@ -80,6 +85,7 @@ def is_auth_user(user:UserInfo):
 
 def handle_message(request, _settings):
     bot.set_token(_settings.token)
+    bot.set_settings(_settings)
     api.set_api(_settings.api_key)
 
     bot.process_new_updates([telebot.types.Update.de_json(request.body.decode("utf-8"))])
@@ -89,9 +95,9 @@ def is_user_banned(user:UserInfo):
     if user is None:
         return False
 
-    settings = BotSettings.objects.filter().first()
+    settings = bot.settings
     if settings is None:
-        Return
+        return
 
     if user.errors_before_ban >= settings.allowed_tries:
         user.change_status(UserInfo.USER_STATUS[4][0])
@@ -118,11 +124,16 @@ def is_user_banned(user:UserInfo):
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = Markups("RU")
-    user = UserInfo.objects.filter(telegram_id=message.from_user.id).first()
+    user: UserInfo = UserInfo.objects.filter(telegram_id=message.from_user.id).first()
+
 
     if is_auth_user(user):
         bot.send_message(user.telegram_id, markup.text.menu_text, reply_markup=markup.start_menu())
         return
+
+    if not is_user_banned(user):
+        user.change_status(None)
+        
 
     text_description = markup.text.welcome_text
     bot.send_message(message.from_user.id, text_description, reply_markup=markup.auth())
