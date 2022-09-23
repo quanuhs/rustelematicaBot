@@ -12,7 +12,7 @@ import asyncio
 
 
 class TelegramBot(telebot.TeleBot):
-    settings = None
+    settings: BotSettings = None
     
     def set_token(self, new_token):
         self.token = new_token
@@ -54,7 +54,7 @@ class Markups:
 
 async def check_test_button(user: UserInfo, button_pressed_text, button_not_pressed_text, sleep_time_sec:float=3.0, times: int=3):
     _text = button_not_pressed_text
-    for i in range(times):
+    for i in range(int(round(bot.settings.max_test_duration/bot.settings.test_interval))):
         if not is_auth_user(user):
             return
         
@@ -62,7 +62,7 @@ async def check_test_button(user: UserInfo, button_pressed_text, button_not_pres
             _text = button_pressed_text
             break
         else:
-            await asyncio.sleep(sleep_time_sec)
+            await asyncio.sleep(bot.settings.test_interval)
 
     bot.send_message(user.telegram_id, _text)
     return True

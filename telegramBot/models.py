@@ -12,6 +12,8 @@ class BotSettings(models.Model):
     webhook_secret = models.CharField(max_length=128, verbose_name="Код webhook")
     
     allowed_tries = models.IntegerField(default=3, verbose_name="Разрешенное количество попыток ввода данных")
+    max_test_duration = models.FloatField(default=9.0, verbose_name="Продолжительность опроса сервера в режиме тестирования (сек)")
+    test_interval = models.FloatField(default=3.0, verbose_name="Интервал опроса сервера в режиме тестирования (сек)")
 
     def __str__(self):
         return f"{self.webhook_secret}"
