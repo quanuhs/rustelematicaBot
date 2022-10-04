@@ -25,7 +25,7 @@ class BotSettings(models.Model):
 
 class UserInfo(models.Model):
     telegram_id = models.CharField(verbose_name="id пользователя в Telegram", max_length=16)
-    name = models.CharField(verbose_name="Имя пользователя в Telegram", max_length=32)
+    name = models.CharField(verbose_name="Имя пользователя в Telegram", max_length=32, null=True, blank=True)
 
     panel_id = models.IntegerField(verbose_name="panelid для работы с API", null=True, blank=True)
     codechkts = models.TextField(verbose_name="codechkts для работы с API", null=True, blank=True)

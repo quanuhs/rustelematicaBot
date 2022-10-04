@@ -131,7 +131,7 @@ def start(message):
         bot.send_message(user.telegram_id, markup.text.menu_text, reply_markup=markup.start_menu())
         return
 
-    if not is_user_banned(user):
+    if user is not None and not is_user_banned(user):
         user.change_status(None)
         
 
@@ -141,7 +141,7 @@ def start(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_callback(call: telebot.types.CallbackQuery):
-    user, created = UserInfo.objects.get_or_create(telegram_id=call.from_user.id, name=call.from_user.username or "unknown")
+    user, created = UserInfo.objects.get_or_create(telegram_id=call.from_user.id, name=call.from_user.username or None)
     markup = Markups("RU")
     
     try:
