@@ -1,6 +1,8 @@
 from operator import mod
 from pyexpat import model
+from tabnanny import verbose
 from django.db import models
+from traitlets import default
 
 
 class BotSettings(models.Model):
@@ -14,6 +16,8 @@ class BotSettings(models.Model):
     allowed_tries = models.IntegerField(default=3, verbose_name="Разрешенное количество попыток ввода данных")
     max_test_duration = models.FloatField(default=9.0, verbose_name="Продолжительность опроса сервера в режиме тестирования (сек)")
     test_interval = models.FloatField(default=3.0, verbose_name="Интервал опроса сервера в режиме тестирования (сек)")
+
+    test_duration = models.FloatField(default=240.0, verbose_name="Продолжительность режима тестирования (сек)")
 
     def __str__(self):
         return f"{self.webhook_secret}"
@@ -109,6 +113,8 @@ class BotDictionary(models.Model):
 
     user_banned = models.TextField(verbose_name="Текст - вы временно заблокированы")
     user_banned_second = models.TextField(verbose_name="Текст - секунд", default="секунд")
+    
+    test_ended = models.TextField(verbose_name="Текст - режим тестирования завершен" )
     
     
     def __str__(self):

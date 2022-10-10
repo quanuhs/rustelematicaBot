@@ -33,9 +33,13 @@ class Markups:
     def text(self) -> BotDictionary:
         return BotDictionary.objects.filter(language=self.language).first()
 
-    def start_menu(self):
+    def start_menu(self, show_check=True):
         keyboard = types.ReplyKeyboardMarkup(True, False)
-        keyboard.row(self.text.menu_btn_status, self.text.menu_btn_check)
+        if show_check:
+            keyboard.row(self.text.menu_btn_status, self.text.menu_btn_check)
+        else:
+            keyboard.row(self.text.menu_btn_status)
+        
         keyboard.row(self.text.menu_btn_logout)
         return keyboard
 
@@ -52,7 +56,7 @@ class Markups:
         return keyboard
     
 
-async def check_test_button(user: UserInfo, button_pressed_text, button_not_pressed_text, sleep_time_sec:float=3.0, times: int=3):
+async def check_test_button(user: UserInfo, button_pressed_text, button_not_pressed_text):
     _text = button_not_pressed_text
     for i in range(int(round(bot.settings.max_test_duration/bot.settings.test_interval))):
         if not is_auth_user(user):
@@ -68,6 +72,11 @@ async def check_test_button(user: UserInfo, button_pressed_text, button_not_pres
     return True
     
 
+
+async def say_hello(user: UserInfo, sleep_time_sec: float = 30):
+    await asyncio.sleep(sleep_time_sec)
+    bot.send_message(user.telegram_id, "okey")
+    
 
 def is_auth_user(user:UserInfo):
     if user is None:
@@ -272,7 +281,7 @@ def user_handle_text(message, markup, user):
     return True
 
 
-
+from .tasks import notify_after_test
 def start_test(user, markup):
     """
     Переводит объект авторизованного пользователя в режим тестирования
@@ -284,7 +293,7 @@ def start_test(user, markup):
     if api.set_test_mode(user.panel_id, user.object_uuid, 0, True).get("servicemode"):
         user.service_time = datetime.datetime.now(timezone.utc)
         user.save()
-        bot.send_message(user.telegram_id, markup.text.test_is_on)
+        bot.send_message(user.telegram_id, markup.text.test_is_on, reply_markup=markup.start_menu(False))
         
         try:
             loop = asyncio.get_running_loop()
@@ -292,8 +301,11 @@ def start_test(user, markup):
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
         
-        task = loop.create_task(check_test_button(user, markup.text.alert_pressed, markup.text.alert_not_pressed))
-        loop.run_until_complete(task)
+        
+        _task = loop.create_task(check_test_button(user, markup.text.alert_pressed, markup.text.alert_not_pressed))
+        notify_after_test.apply_async(args=[user.telegram_id, markup.text.test_ended, markup.start_menu().to_json()], countdown=bot.settings.test_duration)
+
+        loop.run_until_complete(_task)
         loop.close()
     
     else:
@@ -303,12 +315,13 @@ def start_test(user, markup):
 
 
 def check_system(user:UserInfo, markup:Markups):
+
     """
     Проверяет тревожную кнопку объекта
     Если время последний запуск тестирования был более 4 минут назад
     --> Предлагает перверсти объект в режим тестирования
-    
     """
+
     if not is_auth_user(user):
         return False
     
@@ -318,7 +331,7 @@ def check_system(user:UserInfo, markup:Markups):
         
     time_differ = datetime.datetime.now(tz=timezone.utc) - user.service_time
     
-    if time_differ.total_seconds() >= 60*4:
+    if time_differ.total_seconds() >= bot.settings.test_duration:
         bot.send_message(user.telegram_id, markup.text.ask_turn_cmd2, reply_markup=markup.agree_or_not())
         return
 

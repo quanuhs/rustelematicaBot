@@ -9,3 +9,4 @@ bin
 lib
 /__pycache__/
 
+dump.rdb
