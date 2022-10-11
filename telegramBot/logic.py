@@ -72,12 +72,6 @@ async def check_test_button(user: UserInfo, button_pressed_text, button_not_pres
     return True
     
 
-
-async def say_hello(user: UserInfo, sleep_time_sec: float = 30):
-    await asyncio.sleep(sleep_time_sec)
-    bot.send_message(user.telegram_id, "okey")
-    
-
 def is_auth_user(user:UserInfo):
     if user is None:
         return False
@@ -275,7 +269,8 @@ def user_handle_text(message, markup, user):
         msg = bot.send_message(user.telegram_id, "logout", reply_markup=telebot.types.ReplyKeyboardRemove())
         bot.send_message(user.telegram_id, markup.text.auth_text, reply_markup=markup.auth())
         bot.delete_message(user.telegram_id, msg.message_id)
-        user.delete()
+        user.change_status(None)
+        user.clear_data()
         
 
     return True
