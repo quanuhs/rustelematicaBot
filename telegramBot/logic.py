@@ -122,7 +122,7 @@ def is_user_banned(user:UserInfo):
         return False
 
     return True
-    
+
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -229,7 +229,8 @@ def temp_handle_text(message, markup, temp_user):
             temp_user.codechstate = message.text
             temp_user.change_status(UserInfo.USER_STATUS[3][0], False)
             temp_user.object_uuid = data.get("idobject")
-            bot.send_message(temp_user.telegram_id, markup.text.auth_success, reply_markup=markup.start_menu())
+            time_differ = datetime.datetime.now(tz=timezone.utc) - user.service_time
+            bot.send_message(temp_user.telegram_id, markup.text.auth_success, reply_markup=markup.start_menu(time_differ.total_seconds() >= bot.settings.test_duration))
 
     if error_message:
         bot.send_message(temp_user.telegram_id, error_message, reply_markup=markup.auth())
