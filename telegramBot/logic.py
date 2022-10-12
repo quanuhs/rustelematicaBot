@@ -58,7 +58,9 @@ class Markups:
 
 async def check_test_button(user: UserInfo, button_pressed_text, button_not_pressed_text):
     _text = button_not_pressed_text
+    
     for i in range(int(round(bot.settings.max_test_duration/bot.settings.test_interval))):
+        user.refresh_from_db()
         if not is_auth_user(user):
             return False
         
