@@ -60,7 +60,11 @@ async def check_test_button(user: UserInfo, button_pressed_text, button_not_pres
     _text = button_not_pressed_text
     
     for i in range(int(round(bot.settings.max_test_duration/bot.settings.test_interval))):
-        user.refresh_from_db()
+        try:
+            user.refresh_from_db()
+        except Exception as e:
+            bot.send_message(user.telegram_id, str(e))
+            
         if not is_auth_user(user):
             return False
         
