@@ -131,7 +131,8 @@ def start(message):
 
 
     if is_auth_user(user):
-        bot.send_message(user.telegram_id, markup.text.menu_text, reply_markup=markup.start_menu())
+        time_differ = datetime.datetime.now(tz=timezone.utc) - user.service_time
+        bot.send_message(user.telegram_id, markup.text.menu_text, reply_markup=markup.start_menu(time_differ.total_seconds() >= bot.settings.test_duration))
         return
 
     if user is not None and not is_user_banned(user):
@@ -187,6 +188,7 @@ def handle_text(message):
     
     if is_auth_user(user):
         user_handle_text(message, markup, user)
+        return
     
     if user is None or user.status == None:
         bot.send_message(message.from_user.id, markup.text.auth_text, reply_markup=markup.auth())
