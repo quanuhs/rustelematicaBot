@@ -4,7 +4,7 @@ from telebot import types
 from .api_handler import RustelematicaAPI
 
 from .models import BotDictionary, BotSettings, UserInfo
-from asgiref.sync import sync_to_async
+from asgiref.sync import async_to_sync
 
 import datetime
 from datetime import date, timezone
@@ -62,7 +62,7 @@ async def check_test_button(user: UserInfo, button_pressed_text, button_not_pres
     
     for i in range(int(round(bot.settings.max_test_duration/bot.settings.test_interval))):
         try:
-            await sync_to_async(user.refresh_from_db())
+            async_to_sync(user.refresh_from_db())
         except Exception as e:
             bot.send_message(user.telegram_id, str(e))
             
