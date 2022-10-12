@@ -60,7 +60,7 @@ async def check_test_button(user: UserInfo, button_pressed_text, button_not_pres
     _text = button_not_pressed_text
     for i in range(int(round(bot.settings.max_test_duration/bot.settings.test_interval))):
         if not is_auth_user(user):
-            return
+            return False
         
         if api.check_test(1, user.panel_id, user.object_uuid, user.service_time, 1201):
             _text = button_pressed_text
@@ -68,11 +68,11 @@ async def check_test_button(user: UserInfo, button_pressed_text, button_not_pres
         else:
             await asyncio.sleep(bot.settings.test_interval)
 
-    if not is_auth_user(user):
-            return
-        
-    bot.send_message(user.telegram_id, _text)
-    return True
+    if is_auth_user(user):
+        bot.send_message(user.telegram_id, _text)
+        return True
+    
+    return False
     
 
 def is_auth_user(user:UserInfo):
