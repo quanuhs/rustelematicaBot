@@ -229,7 +229,7 @@ def temp_handle_text(message, markup, temp_user):
             temp_user.codechstate = message.text
             temp_user.change_status(UserInfo.USER_STATUS[3][0], False)
             temp_user.object_uuid = data.get("idobject")
-            time_differ = datetime.datetime.now(tz=timezone.utc) - user.service_time
+            time_differ = datetime.datetime.now(tz=timezone.utc) - temp_user.service_time
             bot.send_message(temp_user.telegram_id, markup.text.auth_success, reply_markup=markup.start_menu(time_differ.total_seconds() >= bot.settings.test_duration))
 
     if error_message:
