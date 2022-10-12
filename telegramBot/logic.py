@@ -4,7 +4,7 @@ from telebot import types
 from .api_handler import RustelematicaAPI
 
 from .models import BotDictionary, BotSettings, UserInfo
-from asgiref.sync import async_to_sync
+from asgiref.sync import sync_to_async
 
 import datetime
 from datetime import date, timezone
@@ -55,14 +55,18 @@ class Markups:
         keyboard.add(types.InlineKeyboardButton(text=self.text.confirm_btn_yes, callback_data="yes"))
         keyboard.add(types.InlineKeyboardButton(text=self.text.confirm_btn_no, callback_data="no"))
         return keyboard
-    
+
+
+def refresh_user(user):
+    user.refresh_from_db()
+    return user
 
 async def check_test_button(user: UserInfo, button_pressed_text, button_not_pressed_text):
     _text = button_not_pressed_text
     
     for i in range(int(round(bot.settings.max_test_duration/bot.settings.test_interval))):
         try:
-            async_to_sync(user.refresh_from_db())
+            await sync_to_async(refresh_user, thread_sensitive=True)(user=user)
         except Exception as e:
             bot.send_message(user.telegram_id, str(e))
             
