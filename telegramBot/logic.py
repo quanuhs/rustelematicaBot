@@ -166,6 +166,8 @@ def handle_callback(call: telebot.types.CallbackQuery):
         username = ""
     
     user, created = UserInfo.objects.get_or_create(telegram_id=call.from_user.id, name=username)
+    if created:
+        user.service_time = datetime.datetime.now(tz=timezone.utc) - datetime.timedelta(seconds=bot.settings.test_duration)
     markup = Markups("RU")
     
     try:
