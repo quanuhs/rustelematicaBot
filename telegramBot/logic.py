@@ -159,7 +159,13 @@ def start(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_callback(call: telebot.types.CallbackQuery):
-    user, created = UserInfo.objects.get_or_create(telegram_id=call.from_user.id, name=call.from_user.username or "")
+    username = ""
+    try:
+        username = call.from_user.username
+    except Exception:
+        username = ""
+    
+    user, created = UserInfo.objects.get_or_create(telegram_id=call.from_user.id, name=username)
     markup = Markups("RU")
     
     try:
